@@ -197,6 +197,7 @@ describe("madness", () => {
 
   it("does not count a covered omen toward madness", () => {
     const ada = player({
+      id: "a",
       omen: [
         { ...card("25", "mist"), coveringInstanceId: "other" },
         card("26", "keep"),
