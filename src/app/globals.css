@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0c100d;
+  --bg-2: #141a15;
+  --ink: #e6dcc4;
+  --muted: #9a917c;
+  --gold: #c9a227;
+  --gold-dim: #7a6416;
+  --line: #3a3324;
+  --danger: #8f2d2d;
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-body);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 700px at 50% -10%, #1d2a1c 0%, transparent 55%),
+    radial-gradient(800px 500px at 80% 110%, #1a140c 0%, transparent 50%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), "Palatino Linotype", Palatino, serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  touch-action: manipulation;
+}
+
+.ritual-panel {
+  background: linear-gradient(180deg, rgba(28, 34, 27, 0.92), rgba(12, 16, 13, 0.96));
+  border: 1px solid var(--line);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.35);
+}
+
+.gold-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+
+.token {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  border: 2px solid #1a140c;
+  box-shadow: 0 0 0 1px rgba(230, 220, 196, 0.15);
+}
