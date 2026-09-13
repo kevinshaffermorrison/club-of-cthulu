@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GameBoard } from "@/components/GameBoard";
+import { HomeLink } from "@/components/HomeLink";
 import { Lobby } from "@/components/Lobby";
 import {
   applyOptimistic,
@@ -9,7 +10,7 @@ import {
   type PrivateView,
   type PublicGameState,
 } from "@/game";
-import { ensureGuestSession } from "@/lib/auth/ensure-session";
+import { ensureGuestSession, googleAvatarUrl } from "@/lib/auth/ensure-session";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { applyPlayerChange, useRoomSync } from "@/lib/use-room-sync";
 import type { PlayerRow, RoomRow } from "@/server/game-service";
@@ -79,7 +80,13 @@ export function RoomClient({ code }: { code: string }) {
       await ensureGuestSession(supabase);
     }
     const { data: userData } = await supabase.auth.getUser();
-    if (userData.user) setUserId(userData.user.id);
+    if (userData.user) {
+      setUserId(userData.user.id);
+      const avatar = googleAvatarUrl(userData.user);
+      if (avatar) {
+        await supabase.rpc("set_my_avatar", { p_avatar_url: avatar });
+      }
+    }
 
     const { data: roomRow, error: roomError } = await supabase
       .from("rooms")
@@ -233,9 +240,10 @@ export function RoomClient({ code }: { code: string }) {
 
   if (!userId || !room) {
     return (
-      <p className="p-8 text-center text-[#9a917c]">
-        {error ?? "Approaching the circle…"}
-      </p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
+        <HomeLink />
+        <p className="text-center text-[#9a917c]">{error ?? "Approaching the circle…"}</p>
+      </div>
     );
   }
 
@@ -258,9 +266,11 @@ export function RoomClient({ code }: { code: string }) {
         }}
         onAddLocal={async (name) => {
           const supabase = createBrowserSupabase();
+          const { data: userData } = await supabase.auth.getUser();
           const { error: rpcError } = await supabase.rpc("add_local_seat", {
             p_room_id: room.id,
             p_display_name: name,
+            p_avatar_url: googleAvatarUrl(userData.user),
           });
           if (rpcError) setError(rpcError.message);
         }}
@@ -269,13 +279,26 @@ export function RoomClient({ code }: { code: string }) {
     );
   }
 
+  const gameWithAvatars = game
+    ? {
+        ...game,
+        players: game.players.map((player) => ({
+          ...player,
+          avatarUrl:
+            player.avatarUrl ??
+            players.find((seat) => seat.id === player.id)?.avatar_url ??
+            null,
+        })),
+      }
+    : null;
+
   return (
     <>
       {error ? (
         <p className="bg-[#8f2d2d]/40 px-4 py-2 text-center text-sm">{error}</p>
       ) : null}
       <GameBoard
-        game={game}
+        game={gameWithAvatars!}
         userId={userId}
         privateView={privateView}
         realtimeStatus={realtimeStatus}

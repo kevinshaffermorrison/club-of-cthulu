@@ -42,6 +42,7 @@ export interface PlayerState {
   seatIndex: number;
   displayName: string;
   controllerUserId: string;
+  avatarUrl?: string | null;
   journal: Record<Deity, CardInstance[]>;
   omen: CardInstance[];
   mad: Record<Deity, boolean>;
@@ -121,6 +122,7 @@ export interface PublicPlayer {
   seatIndex: number;
   displayName: string;
   controllerUserId: string;
+  avatarUrl?: string | null;
   journal: Record<Deity, CardInstance[]>;
   omen: CardInstance[];
   mad: Record<Deity, boolean>;

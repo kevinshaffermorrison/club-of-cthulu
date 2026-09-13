@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
         id: player.id,
         displayName: player.display_name,
         controllerUserId: player.controller_user_id,
+        avatarUrl: player.avatar_url ?? null,
       })),
     });
     await admin.from("games").insert({

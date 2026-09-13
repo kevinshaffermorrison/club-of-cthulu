@@ -7,8 +7,9 @@ import {
   type Deity,
   type PublicPlayer,
 } from "@/game";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { DesecrationBadge } from "./DesecrationBadge";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { ManuscriptTile, type CardDrag } from "./ManuscriptTile";
 
 const JOURNAL_PEEK_REM = 1.15;
@@ -28,6 +29,8 @@ export function JournalZoom({
   onDrop,
   onDragBegin,
   onDragEnd,
+  actions,
+  logLine,
 }: {
   player: PublicPlayer;
   omenSelectable?: (card: CardInstance) => boolean;
@@ -43,6 +46,8 @@ export function JournalZoom({
   onDrop?: (drag: CardDrag, target: { type: "journal"; deity: Deity } | { type: "omen" }) => void;
   onDragBegin?: (drag: CardDrag) => void;
   onDragEnd?: () => void;
+  actions?: ReactNode;
+  logLine?: string;
 }) {
   const [hoverDeity, setHoverDeity] = useState<Deity | null>(null);
   function parseDrag(event: React.DragEvent): CardDrag | null {
@@ -84,15 +89,63 @@ export function JournalZoom({
   }
 
   return (
-      <div className="ritual-panel max-h-[min(78vh,calc(100dvh-11rem))] overflow-auto rounded-md p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-[family-name:var(--font-display)] text-lg tracking-[0.2em] uppercase">
-          {player.displayName}
+    <div className="ritual-panel max-h-[calc(100dvh-7rem)] overflow-auto rounded-md p-2">
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="flex min-w-0 items-center gap-2 font-[family-name:var(--font-display)] text-base tracking-[0.2em] uppercase">
+          <PlayerAvatar name={player.displayName} src={player.avatarUrl} size="sm" />
+          <span className="truncate">{player.displayName}</span>
         </h2>
         <DesecrationBadge held={player.hasDesecration} />
       </div>
+      <div
+        className={`sticky top-0 z-20 mb-3 rounded-sm border p-2 backdrop-blur-sm transition ${
+          omenDroppable
+            ? "border-[#c9a227] bg-[#14110b]/95 shadow-[0_0_18px_rgba(201,162,39,0.35)]"
+            : "border-[#c9a227]/70 bg-[#14110b]/95"
+        }`}
+        onDragOver={(event) => {
+          if (omenDroppable) event.preventDefault();
+        }}
+        onDrop={(event) => {
+          if (!omenDroppable || !onDrop) return;
+          event.preventDefault();
+          const drag = parseDrag(event);
+          if (drag) onDrop(drag, { type: "omen" });
+        }}
+      >
+        <p className="mb-2 text-[0.7rem] uppercase tracking-[0.2em] text-[#c9a227]">
+          Actions · Omen
+        </p>
+        {actions ? <div className="mb-3">{actions}</div> : null}
+        <div className="flex flex-wrap items-start gap-2">
+          {player.omen.length === 0 ? (
+            <p className="text-xs text-[#9a917c]">Empty omen zone</p>
+          ) : (
+            groupOmenCards(player.omen).map((entry) =>
+              entry.kind === "cover" ? (
+                <div
+                  key={`${entry.cover.instanceId}-${entry.hidden.instanceId}`}
+                  className="relative h-[8.4rem] w-[6.7rem]"
+                >
+                  <div className="absolute left-3 top-4 z-0">
+                    {renderOmenTile(entry.hidden, "hidden")}
+                  </div>
+                  <div className="absolute left-0 top-0 z-10">
+                    {renderOmenTile(entry.cover, "covering")}
+                  </div>
+                </div>
+              ) : (
+                <div key={entry.card.instanceId}>{renderOmenTile(entry.card)}</div>
+              ),
+            )
+          )}
+        </div>
+        {logLine ? (
+          <p className="mt-2 truncate text-[0.7rem] text-[#9a917c]">{logLine}</p>
+        ) : null}
+      </div>
       {player.setupHand.length > 0 ? (
-        <div className="mb-4">
+        <div className="mb-3">
           <p className="mb-2 text-[0.7rem] uppercase tracking-[0.2em] text-[#9a917c]">
             Opening pages — drag onto a matching color
           </p>
@@ -115,49 +168,6 @@ export function JournalZoom({
           </div>
         </div>
       ) : null}
-      <div
-        className={`mb-4 min-h-[6rem] rounded-sm border border-dashed p-2 transition ${
-          omenDroppable
-            ? "border-[#c9a227] bg-[#c9a227]/15 shadow-[0_0_18px_rgba(201,162,39,0.35)]"
-            : "border-[#3a3324]"
-        }`}
-        onDragOver={(event) => {
-          if (omenDroppable) event.preventDefault();
-        }}
-        onDrop={(event) => {
-          if (!omenDroppable || !onDrop) return;
-          event.preventDefault();
-          const drag = parseDrag(event);
-          if (drag) onDrop(drag, { type: "omen" });
-        }}
-      >
-        <p className="mb-2 text-[0.7rem] uppercase tracking-[0.2em] text-[#9a917c]">
-          Omen zone
-        </p>
-        <div className="flex flex-wrap items-start gap-2">
-          {player.omen.length === 0 ? (
-            <p className="text-xs text-[#9a917c]">Empty</p>
-          ) : (
-            groupOmenCards(player.omen).map((entry) =>
-              entry.kind === "cover" ? (
-                <div
-                  key={`${entry.cover.instanceId}-${entry.hidden.instanceId}`}
-                  className="relative h-[8.4rem] w-[6.7rem]"
-                >
-                  <div className="absolute left-3 top-4 z-0">
-                    {renderOmenTile(entry.hidden, "hidden")}
-                  </div>
-                  <div className="absolute left-0 top-0 z-10">
-                    {renderOmenTile(entry.cover, "covering")}
-                  </div>
-                </div>
-              ) : (
-                <div key={entry.card.instanceId}>{renderOmenTile(entry.card)}</div>
-              ),
-            )
-          )}
-        </div>
-      </div>
       <div className="grid gap-3 sm:grid-cols-5">
         {DEITIES.map((deity) => (
           <div

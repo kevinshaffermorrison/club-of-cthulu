@@ -1,6 +1,7 @@
 "use client";
 
 import { DEITY_META, cardDeities, isDual } from "@/game";
+import { DeityMark } from "./DeityMarks";
 
 const CARD_SHELL =
   "relative overflow-hidden rounded-[0.35rem] border shadow-[2px_3px_0_rgba(0,0,0,0.45)]";
@@ -77,15 +78,17 @@ export function CardFace({
       style={{ background }}
     >
       <div className="absolute inset-[7%] rounded-[0.15rem] border border-black/25 bg-black/10" />
-      <div className="absolute left-1.5 top-1.5 flex gap-0.5">
-        {deities.map((deity) => (
-          <span
-            key={deity}
-            className="h-2 w-2 rounded-[1px] border border-black/40"
-            style={{ background: DEITY_META[deity].color }}
-          />
-        ))}
-      </div>
+      {dual ? (
+        <div className="absolute inset-x-[6%] bottom-[20%] top-[10%] grid grid-cols-2 gap-[6%]">
+          {deities.map((deity) => (
+            <DeityMark key={deity} deity={deity} />
+          ))}
+        </div>
+      ) : (
+        <div className="absolute inset-x-[18%] bottom-[20%] top-[10%]">
+          <DeityMark deity={deities[0]!} />
+        </div>
+      )}
       <p
         className="absolute bottom-1.5 left-1 right-1 text-center font-[family-name:var(--font-display)] text-[0.62rem] font-semibold uppercase leading-tight tracking-wide"
         style={{

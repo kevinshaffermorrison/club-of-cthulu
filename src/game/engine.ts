@@ -63,6 +63,7 @@ export function createEmptyPlayer(input: {
   seatIndex: number;
   displayName: string;
   controllerUserId: string;
+  avatarUrl?: string | null;
 }): PlayerState {
   return {
     ...input,
@@ -76,7 +77,12 @@ export function createEmptyPlayer(input: {
 
 export function createGame(input: {
   id: string;
-  players: { id: string; displayName: string; controllerUserId: string }[];
+  players: {
+    id: string;
+    displayName: string;
+    controllerUserId: string;
+    avatarUrl?: string | null;
+  }[];
   scoringDeity: Deity;
   rng?: () => number;
 }): GameState {
@@ -146,6 +152,7 @@ export function toPublicState(state: GameState): PublicGameState {
       seatIndex: player.seatIndex,
       displayName: player.displayName,
       controllerUserId: player.controllerUserId,
+      avatarUrl: player.avatarUrl ?? null,
       journal: player.journal,
       omen: player.omen,
       mad: player.mad,

@@ -14,8 +14,11 @@ import { JournalZoom } from "./JournalZoom";
 import type { CardDrag } from "./ManuscriptTile";
 import { PassGate } from "./PassGate";
 import { PentagramBoard } from "./PentagramBoard";
+import { ScoringStrategyChip } from "./ScoringCard";
+import { HomeLink } from "./HomeLink";
 import { ScoringOverlay } from "./ScoringOverlay";
 import { SeatScoreboard } from "./SeatScoreboard";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 export function GameBoard({
   game,
@@ -119,9 +122,13 @@ export function GameBoard({
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col pb-40">
+    <div className="relative flex min-h-screen flex-col">
       {game.phase === "game_over" && game.scores ? (
-        <ScoringOverlay scores={game.scores} scoringDeity={game.scoringDeity} />
+        <ScoringOverlay
+          scores={game.scores}
+          scoringDeity={game.scoringDeity}
+          players={game.players}
+        />
       ) : null}
       {showGate && actingId ? (
         <PassGate
@@ -133,8 +140,9 @@ export function GameBoard({
         />
       ) : null}
 
-      <header className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+      <header className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
         <div className="flex items-center gap-3">
+          <HomeLink />
           <h1 className="font-[family-name:var(--font-display)] text-lg tracking-[0.25em] uppercase">
             Club of Cthulhu
           </h1>
@@ -153,6 +161,7 @@ export function GameBoard({
                 ? "Offline"
                 : "Linking"}
           </span>
+          <ScoringStrategyChip deity={game.scoringDeity} />
         </div>
         {localSeats.length > 1 ? (
           <div className="flex gap-2">
@@ -164,12 +173,13 @@ export function GameBoard({
                   setManualSeat(seat.id);
                   setFocus(seat.id);
                 }}
-                className={`rounded-sm px-2 py-1 text-xs uppercase tracking-wider ${
+                className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs uppercase tracking-wider ${
                   activeSeat === seat.id
                     ? "bg-[#c9a227] text-[#14110b]"
                     : "border border-[#3a3324] text-[#9a917c]"
                 }`}
               >
+                <PlayerAvatar name={seat.displayName} src={seat.avatarUrl} size="sm" />
                 {seat.displayName}
               </button>
             ))}
@@ -177,7 +187,7 @@ export function GameBoard({
         ) : null}
       </header>
 
-      <div className="flex flex-wrap gap-3 px-4">
+      <div className="flex flex-wrap gap-2 px-3">
         {game.players.map((player) => (
           <SeatScoreboard
             key={player.id}
@@ -192,12 +202,11 @@ export function GameBoard({
         ))}
       </div>
 
-      <div className="grid flex-1 gap-4 px-4 py-4 lg:grid-cols-[minmax(260px,420px)_minmax(0,1fr)]">
-        <div className="flex justify-center lg:sticky lg:top-4 lg:self-start">
+      <div className="grid flex-1 gap-3 px-3 py-2 lg:grid-cols-[minmax(20rem,32rem)_minmax(0,1fr)]">
+        <div className="order-2 flex min-w-0 justify-center lg:order-1 lg:sticky lg:top-2 lg:self-start">
           <PentagramBoard
             piles={game.piles}
             desecrationCenter={game.desecrationCenter}
-            scoringDeity={game.scoringDeity}
             selectedPile={selectedPile ?? memoryFirst}
             droppablePiles={
               activeDrag?.kind === "journal" ? droppablePiles : []
@@ -241,7 +250,7 @@ export function GameBoard({
           />
         </div>
 
-        <div className="flex min-w-0 flex-col">
+        <div className="order-1 flex min-w-0 flex-col lg:order-2">
           {focusedPlayer ? (
             <JournalZoom
               player={focusedPlayer}
@@ -320,26 +329,23 @@ export function GameBoard({
               onDrop={onCardDrop}
               onDragBegin={setActiveDrag}
               onDragEnd={() => setActiveDrag(null)}
+              logLine={game.log.at(-1)}
+              actions={
+                <ActionDock
+                  game={game}
+                  actor={actor}
+                  privateView={privateView}
+                  selectedCardId={selectedCardId}
+                  selectedPile={selectedPile}
+                  onAct={(action) => {
+                    if (!actor) return;
+                    send(action);
+                  }}
+                />
+              }
             />
           ) : null}
         </div>
-      </div>
-
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#3a3324] bg-[#0c100d]/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
-        <ActionDock
-          game={game}
-          actor={actor}
-          privateView={privateView}
-          selectedCardId={selectedCardId}
-          selectedPile={selectedPile}
-          onAct={(action) => {
-            if (!actor) return;
-            send(action);
-          }}
-        />
-        <p className="mt-2 truncate text-center text-[0.7rem] text-[#9a917c]">
-          {game.log.at(-1)}
-        </p>
       </div>
     </div>
   );

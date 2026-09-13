@@ -14,6 +14,7 @@ import {
   type PublicPlayer,
 } from "@/game";
 import { ManuscriptTile } from "./ManuscriptTile";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 export function ActionDock({
   game,
@@ -32,7 +33,7 @@ export function ActionDock({
 }) {
   if (!actor) {
     return (
-      <div className="ritual-panel rounded-md p-3 text-sm text-[#9a917c]">
+      <div className="text-sm text-[#9a917c]">
         Watching the circle.
       </div>
     );
@@ -56,7 +57,7 @@ export function ActionDock({
     }
     const options = cardDeities(card.cardId);
     return (
-      <div className="ritual-panel rounded-md p-3">
+      <div>
         <p className="mb-2 text-[0.7rem] uppercase tracking-[0.2em] text-[#c9a227]">
           File opening pages onto a matching color
         </p>
@@ -86,7 +87,7 @@ export function ActionDock({
   if (!youAct) {
     const current = game.players.find((p) => p.id === game.currentPlayerId);
     return (
-      <div className="ritual-panel rounded-md p-3 text-sm text-[#9a917c]">
+      <div className="text-sm text-[#9a917c]">
         {current?.displayName ?? "Another researcher"} is acting.
       </div>
     );
@@ -275,8 +276,9 @@ export function ActionDock({
               pending.kind === "whisper_take" ? (
                 <span
                   key={p.id}
-                  className="rounded-sm border border-[#3a3324] px-3 py-2 text-sm text-[#9a917c]"
+                  className="inline-flex items-center gap-2 rounded-sm border border-[#3a3324] px-3 py-2 text-sm text-[#9a917c]"
                 >
+                  <PlayerAvatar name={p.displayName} src={p.avatarUrl} size="sm" />
                   {p.displayName}
                 </span>
               ) : (
@@ -284,7 +286,10 @@ export function ActionDock({
                   key={p.id}
                   onClick={() => onAct({ type: "gift_unfair_target", playerId: p.id })}
                 >
-                  {p.displayName}
+                  <span className="inline-flex items-center gap-2">
+                    <PlayerAvatar name={p.displayName} src={p.avatarUrl} size="sm" />
+                    {p.displayName}
+                  </span>
                 </DockButton>
               ),
             )}
@@ -344,7 +349,10 @@ export function ActionDock({
                 key={p.id}
                 onClick={() => onAct({ type: "gift_defile", playerId: p.id })}
               >
-                {p.displayName}
+                <span className="inline-flex items-center gap-2">
+                  <PlayerAvatar name={p.displayName} src={p.avatarUrl} size="sm" />
+                  {p.displayName}
+                </span>
               </DockButton>
             ))}
         </div>
@@ -399,7 +407,7 @@ export function ActionDock({
   }
 
   return (
-    <div className="ritual-panel rounded-md p-3 text-sm text-[#9a917c]">
+    <div className="text-sm text-[#9a917c]">
       The star waits.
       {privateView.peekedCards?.length ? <PeekCards view={privateView} /> : null}
     </div>
@@ -407,7 +415,7 @@ export function ActionDock({
 }
 
 function Prompt({ children }: { children: React.ReactNode }) {
-  return <div className="ritual-panel space-y-2 rounded-md p-3">{children}</div>;
+  return <div className="space-y-2">{children}</div>;
 }
 
 function Hint({ children }: { children: React.ReactNode }) {
@@ -426,7 +434,7 @@ function DockButton({
       type="button"
       onClick={onClick}
       disabled={!onClick}
-      className="min-h-10 rounded-sm bg-[#c9a227] px-3 py-2 text-sm text-[#14110b] active:brightness-90 disabled:opacity-40"
+      className="min-h-11 rounded-sm bg-[#c9a227] px-4 py-2.5 text-sm font-medium tracking-wide text-[#14110b] active:brightness-90 disabled:opacity-40"
     >
       {children}
     </button>

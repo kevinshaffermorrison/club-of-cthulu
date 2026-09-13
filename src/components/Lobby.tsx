@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { DEITIES, DEITY_META, type Deity } from "@/game";
+import { DEITIES, type Deity } from "@/game";
 import type { PlayerRow, RoomRow } from "@/server/game-service";
+import { ScoringStrategyChip } from "./ScoringCard";
+import { HomeLink } from "./HomeLink";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 export function Lobby({
   room,
@@ -32,21 +35,25 @@ export function Lobby({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-4 py-10">
+      <div className="mb-6 text-center">
+        <HomeLink />
+      </div>
       <p className="text-center text-xs uppercase tracking-[0.35em] text-[#c9a227]">
         Private circle
       </p>
       <h1 className="mt-2 text-center font-[family-name:var(--font-display)] text-4xl">
         {room.code}
       </h1>
-      <p className="mt-2 text-center text-sm text-[#9a917c]">
-        Scoring color: {DEITY_META[room.scoring_deity as Deity]?.short}
-        {" · "}
-        {realtimeStatus === "live"
-          ? "Live"
-          : realtimeStatus === "error"
-            ? "Reconnect the circle"
-            : "Linking…"}
-      </p>
+      <div className="mt-3 flex flex-col items-center gap-2">
+        <ScoringStrategyChip deity={room.scoring_deity as Deity} align="center" />
+        <p className="text-center text-sm text-[#9a917c]">
+          {realtimeStatus === "live"
+            ? "Live"
+            : realtimeStatus === "error"
+              ? "Reconnect the circle"
+              : "Linking…"}
+        </p>
+      </div>
       <p className="mt-1 text-center text-xs text-[#9a917c]">
         Share code <span className="text-[#e6dcc4]">{room.code}</span> and the password so
         others can join from another device.
@@ -58,15 +65,18 @@ export function Lobby({
             key={player.id}
             className="ritual-panel flex items-center justify-between rounded-md px-4 py-3"
           >
-            <div>
-              <p className="font-[family-name:var(--font-display)]">
-                {player.display_name}
-              </p>
-              <p className="text-xs uppercase tracking-wider text-[#9a917c]">
-                Seat {player.seat_index + 1}
-                {player.controller_user_id === userId ? " · this device" : ""}
-                {onlineUserIds.includes(player.controller_user_id) ? " · online" : ""}
-              </p>
+            <div className="flex min-w-0 items-center gap-3">
+              <PlayerAvatar name={player.display_name} src={player.avatar_url} />
+              <div>
+                <p className="font-[family-name:var(--font-display)]">
+                  {player.display_name}
+                </p>
+                <p className="text-xs uppercase tracking-wider text-[#9a917c]">
+                  Seat {player.seat_index + 1}
+                  {player.controller_user_id === userId ? " · this device" : ""}
+                  {onlineUserIds.includes(player.controller_user_id) ? " · online" : ""}
+                </p>
+              </div>
             </div>
             {player.controller_user_id === userId ? (
               <button

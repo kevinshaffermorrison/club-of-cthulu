@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DEITY_META, connectedPiles, type Deity, type PublicPile } from "@/game";
+import { DEITY_META, connectedPiles, type PublicPile } from "@/game";
 import { DEITIES } from "@/game/types";
 import { CardBack, CardFace, EmptyCardSlot } from "./CardArt";
 import type { CardDrag } from "./ManuscriptTile";
@@ -17,7 +17,6 @@ const POINTS: { x: number; y: number }[] = [
 export function PentagramBoard({
   piles,
   desecrationCenter,
-  scoringDeity,
   selectedPile,
   droppablePiles,
   peekCardIds,
@@ -27,7 +26,6 @@ export function PentagramBoard({
 }: {
   piles: PublicPile[];
   desecrationCenter: number;
-  scoringDeity: Deity;
   selectedPile?: number | null;
   droppablePiles?: number[];
   peekCardIds?: Record<number, string>;
@@ -56,7 +54,7 @@ export function PentagramBoard({
   }
 
   return (
-    <div className="relative w-full max-w-[520px]">
+    <div className="relative w-full max-w-[min(28rem,calc(100dvh-12rem))]">
       <svg viewBox="0 0 100 100" className="w-full drop-shadow-[0_0_18px_rgba(201,162,39,0.12)]">
         <polygon
           points={POINTS.map((p) => `${p.x},${p.y}`).join(" ")}
@@ -144,9 +142,6 @@ export function PentagramBoard({
           </button>
         );
       })}
-      <p className="mt-2 text-center text-xs tracking-[0.18em] uppercase text-[#9a917c]">
-        Scoring · {DEITY_META[scoringDeity].short}
-      </p>
     </div>
   );
 }

@@ -1,14 +1,17 @@
 "use client";
 
-import { DEITY_META, type ScoreRow } from "@/game";
+import { DEITY_META, type PublicPlayer, type ScoreRow } from "@/game";
 import type { Deity } from "@/game";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 export function ScoringOverlay({
   scores,
   scoringDeity,
+  players,
 }: {
   scores: ScoreRow[];
   scoringDeity: Deity;
+  players: PublicPlayer[];
 }) {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/70 p-4">
@@ -29,7 +32,12 @@ export function ScoringOverlay({
               key={row.playerId}
               className="flex items-center justify-between gap-3"
             >
-              <span className="font-[family-name:var(--font-display)]">
+              <span className="flex min-w-0 items-center gap-2 font-[family-name:var(--font-display)]">
+                <PlayerAvatar
+                  name={row.displayName}
+                  src={players.find((player) => player.id === row.playerId)?.avatarUrl}
+                  size="sm"
+                />
                 {row.winner ? "★ " : ""}
                 {row.displayName}
               </span>

@@ -2,6 +2,7 @@
 
 import { DEITIES, DEITY_META, scorePlayer, type Deity, type PublicPlayer } from "@/game";
 import { DesecrationBadge } from "./DesecrationBadge";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 export function SeatScoreboard({
   player,
@@ -29,13 +30,16 @@ export function SeatScoreboard({
     <button
       type="button"
       onClick={onClick}
-      className={`ritual-panel min-w-[11.5rem] rounded-md px-3 py-2 text-left ${
+      className={`ritual-panel min-w-[9.5rem] rounded-md px-2 py-1.5 text-left ${
         isViewing ? "ring-2 ring-[#e6dcc4]/80" : ""
       }`}
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="truncate font-[family-name:var(--font-display)] text-sm tracking-wide">
-          {player.displayName}
+        <p className="flex min-w-0 items-center gap-2">
+          <PlayerAvatar name={player.displayName} src={player.avatarUrl} size="sm" />
+          <span className="truncate font-[family-name:var(--font-display)] text-sm tracking-wide">
+            {player.displayName}
+          </span>
         </p>
         <span className="flex shrink-0 items-center gap-1">
           {isYou ? (
@@ -56,7 +60,7 @@ export function SeatScoreboard({
           ) : null}
         </span>
       </div>
-      <div className="mt-2 flex gap-1.5">
+      <div className="mt-1 flex gap-1">
         {DEITIES.map((deity) => {
           const n = player.journal[deity].length;
           const mad = player.mad[deity];
@@ -67,7 +71,7 @@ export function SeatScoreboard({
               title={`${DEITY_META[deity].short}: ${n}`}
             >
               <span
-                className="flex h-6 w-6 items-center justify-center rounded-sm text-[0.7rem] font-semibold"
+                className="flex h-5 w-5 items-center justify-center rounded-sm text-[0.65rem] font-semibold"
                 style={{
                   background: DEITY_META[deity].color,
                   color: DEITY_META[deity].ink,
@@ -83,7 +87,7 @@ export function SeatScoreboard({
           );
         })}
       </div>
-      <div className="mt-2 flex items-center justify-between gap-2">
+      <div className="mt-1 flex items-center justify-between gap-2">
         <p className="text-[0.7rem] text-[#9a917c]">
           {count} pages · {preview} pts
         </p>

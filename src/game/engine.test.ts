@@ -353,25 +353,58 @@ describe("game end", () => {
 });
 
 describe("scoring", () => {
-  it("matches the Cthulhu scoring-card example", () => {
-    const ada = player({
+  it("uses the printed Yellow scoring card", () => {
+    const researcher = player({
       id: "a",
-      mad: {
-        kingInYellow: true,
-        shubNiggurath: false,
-        cthulhu: true,
-        yidhra: false,
-        nyarlathotep: false,
-      },
       journal: {
-        kingInYellow: [card("1")],
+        kingInYellow: [card("1"), card("2")],
         shubNiggurath: [card("13")],
-        cthulhu: [card("25"), card("26")],
-        yidhra: [card("37"), card("38"), card("39"), card("40")],
-        nyarlathotep: [card("49"), card("50"), card("51"), card("52"), card("53")],
+        cthulhu: [],
+        yidhra: [],
+        nyarlathotep: [],
       },
     });
-    expect(scorePlayer(ada, "cthulhu")).toBe(20);
+    // 2 yellow = 10, 1 red = -9
+    expect(scorePlayer(researcher, "kingInYellow")).toBe(1);
+  });
+
+  it("starts the Green card at -10 / 0 / -5 / 5 for yellow pages", () => {
+    const one = player({
+      id: "a",
+      journal: {
+        kingInYellow: [card("1")],
+        shubNiggurath: [],
+        cthulhu: [],
+        yidhra: [],
+        nyarlathotep: [],
+      },
+    });
+    const four = player({
+      id: "a",
+      journal: {
+        kingInYellow: [card("1"), card("2"), card("3"), card("4")],
+        shubNiggurath: [],
+        cthulhu: [],
+        yidhra: [],
+        nyarlathotep: [],
+      },
+    });
+    expect(scorePlayer(one, "cthulhu")).toBe(-10);
+    expect(scorePlayer(four, "cthulhu")).toBe(5);
+  });
+
+  it("uses squares on the Blue card for red pages", () => {
+    const researcher = player({
+      id: "a",
+      journal: {
+        kingInYellow: [],
+        shubNiggurath: [card("13"), card("14"), card("15"), card("16")],
+        cthulhu: [],
+        yidhra: [],
+        nyarlathotep: [],
+      },
+    });
+    expect(scorePlayer(researcher, "nyarlathotep")).toBe(9);
   });
 });
 

@@ -25,6 +25,7 @@ export type PlayerRow = {
   display_name: string;
   controller_user_id: string;
   is_ready: boolean;
+  avatar_url?: string | null;
 };
 
 export async function requireUser() {
@@ -65,6 +66,7 @@ export async function startGame(roomId: string, userId: string) {
       id: player.id,
       displayName: player.display_name,
       controllerUserId: player.controller_user_id,
+      avatarUrl: player.avatar_url ?? null,
     })),
   });
 
